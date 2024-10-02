@@ -162,13 +162,28 @@ export default App
 
 ## Testing
 
-Aplicando hexagonal junto al patrón repositorio nos permite crear tests unitarios que cumplan con el acrónimo FIRST:
+Aplicando hexagonal junto al patrón repositorio nos permite crear tests unitarios o tests de UI que cumplan con el acrónimo FIRST:
 
 * Fast: sea rápido de ejecutar así obtenemos feedback rápido
 * Isolate: que esté aislado, no dependa de base de datos ni de que tenga internet
 * Repeatable: que siempre dé el mismo resultado.
 * Self-validating: los tests se autovaliden sin tener que analizar si ha pasado o no
 * Timely: los tests se deben crear antes de empezar a desarrollar el código (TDD).
+
+[Vitest](https://vitest.dev/)
+[testing/library](https://testing-library.com/docs/svelte-testing-library/setup) cambiar @testing-library/svelte por @testing-library/react.
+
+Dependiendo del tipo de test que se quiera aplicar pero si son tests más sociables sobre la UI se puede utilizar un servidor http con respuestas predefinidas.
+
+Esto implica que se acabaría incumplimiento la F del acrónimo FIRST dado que al crear servidores http, ésta podría no ser rápida.
+
+Para “mockear” la petición HTTP se podría utilizar MSW:
+
+MSW: Mock Service Worker (MSW) mejora las pruebas de los componentes que realizan llamadas a la API mediante la definición de mocks al nivel de red en lugar de mockear nuestro propio código.
+
+¿Cómo acabaría testeando ésta nueva funcionalidad?
+
+Acabaría omitiendo los tests unitarios (application) ya que carece de lógica y no me aporta valor, y me centraría más en crear tests de UI que prueban todo el flujo aunque falseando la respuesta de la API con MSW.
 
 # React + TypeScript + Vite
 
