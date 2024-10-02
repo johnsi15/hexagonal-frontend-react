@@ -7,9 +7,8 @@ function App() {
   const [users, setUsers] = useState<ProductDTO[]>([])
 
   useEffect(() => {
-    const userRepository = new HttpUserRepository('https://api.codium.team')
+    const userRepository = new HttpUserRepository('https://jsonplaceholder.typicode.com')
     const listUsers = new ListUsers(userRepository)
-
     listUsers.getUsers().then(setUsers)
   }, [])
 
@@ -21,7 +20,7 @@ function App() {
           <li key={user.name} data-testid={'user-id-' + index}>
             <div>
               <h3>{user.name}</h3>
-              <p>Email: ${user.email}</p>
+              <p>Email: {user.email}</p>
             </div>
           </li>
         ))}
