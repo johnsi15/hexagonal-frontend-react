@@ -1,34 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+import ListUsers, { type ProductDTO } from './core/users/application/ListUsers'
 import './App.css'
+import HttpUserRepository from './core/users/adapters/HttpUserRepository'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState<ProductDTO[]>([])
+
+  useEffect(() => {
+    const userRepository = new HttpUserRepository('https://api.codium.team')
+    const listUsers = new ListUsers(userRepository)
+
+    listUsers.getUsers().then(setUsers)
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main>
+      <h1>Lista de usuarios</h1>
+      <ul>
+        {users.map((user, index) => (
+          <li key={user.name} data-testid={'user-id-' + index}>
+            <div>
+              <h3>{user.name}</h3>
+              <p>Email: ${user.email}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </main>
   )
 }
 
