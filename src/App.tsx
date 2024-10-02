@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import ListUsers, { type ProductDTO } from './core/users/application/ListUsers'
-import './App.css'
 import HttpUserRepository from './core/users/adapters/HttpUserRepository'
+import './styles/App.css'
 
 function App() {
   const [users, setUsers] = useState<ProductDTO[]>([])

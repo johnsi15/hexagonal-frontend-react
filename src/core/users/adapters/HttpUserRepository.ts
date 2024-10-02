@@ -1,4 +1,3 @@
-// Infrastructure - Adapters
 import axios from 'axios'
 import { type User, UserRepository } from '../domain/User'
 
