@@ -16,14 +16,14 @@ describe('Component: App', () => {
   it('displays returned users on successful fetch', async () => {
     createGetSuccessResponse('/users', [
       {
-        name: 'Curso de Docker',
-        image: 'https://codium.cdn.com/products/docker.course.jpg',
-        price: 10,
+        name: 'Name 01',
+        email: 'name01@email.com',
+        age: 20,
       },
       {
-        name: 'Curso de legacy code',
-        image: 'https://codium.cdn.com/products/legacy-code-course.jpg',
-        price: 15,
+        name: 'Name 02',
+        email: 'name02@email.com',
+        age: 27,
       },
     ])
 
@@ -31,8 +31,8 @@ describe('Component: App', () => {
 
     const displayedUsers = await screen.findAllByTestId(/user-id-\d+/)
     expect(displayedUsers).toHaveLength(2)
-    expect(screen.getByText('Curso de Docker')).toBeInTheDocument()
-    expect(screen.getByText('Curso de legacy code')).toBeInTheDocument()
+    expect(screen.getByText('Name 01')).toBeInTheDocument()
+    expect(screen.getByText('Name 02')).toBeInTheDocument()
   })
 
   // en caso de que quisiera testear un error
