@@ -47,7 +47,7 @@ Más información en el siguiente [post](https://blog.codium.team/2023-08_arquit
    * Ventaja: La arquitectura hexagonal hace que las responsabilidades de cada componente o módulo sean claras: los adaptadores manejan la interacción con el "mundo exterior" (APIs, bases de datos, etc.), mientras que la lógica de negocio se mantiene en el "núcleo" de la aplicación.
    * Comparación: En una arquitectura monolítica, estas responsabilidades suelen estar mezcladas, lo que puede hacer más difícil entender y mantener el código a largo plazo.
 
-## Desventajas de la Arquitectura Hexagonal en React:
+## Desventajas de la Arquitectura Hexagonal en React
 
 1. Complejidad inicial:
 
@@ -67,7 +67,7 @@ Más información en el siguiente [post](https://blog.codium.team/2023-08_arquit
    * Comparación: La arquitectura en capas tradicional es mucho más rápida de implementar y suficiente para la mayoría de las aplicaciones simples o de corto plazo.
 
 
-## Aplicando arquitectura hexagonal
+## Aplicando arquitectura hexagonal v1
 
 Primera versión con algunos problemas que se le puede llegar a llamar "sobre-ingeniería".
 
@@ -160,6 +160,11 @@ function App() {
 export default App
 ```
 
+## Aplicando arquitectura hexagonal v2
+
+```ts
+```
+
 ## Testing
 
 Aplicando hexagonal junto al patrón repositorio nos permite crear tests unitarios o tests de UI que cumplan con el acrónimo FIRST:
@@ -173,7 +178,27 @@ Aplicando hexagonal junto al patrón repositorio nos permite crear tests unitari
 [Vitest](https://vitest.dev/)
 [testing/library](https://testing-library.com/docs/svelte-testing-library/setup) cambiar @testing-library/svelte por @testing-library/react.
 
-Dependiendo del tipo de test que se quiera aplicar pero si son tests más sociables sobre la UI se puede utilizar un servidor http con respuestas predefinidas.
+
+En este ejemplo no estoy aplicando el "mockear" la peteción HTTP con MSW. v1
+```ts
+import { render, screen } from '@testing-library/react'
+import App from '../App'
+
+describe('Component: App', () => {
+  it('displays returned users on successful fetch', async () => {
+    render(<App />)
+
+    const displayedUsers = await screen.findAllByTestId(/user-id-\d+/)
+    expect(displayedUsers).toHaveLength(10)
+    expect(screen.getByText('Leanne Graham')).toBeInTheDocument()
+    expect(screen.getByText('Patricia Lebsack')).toBeInTheDocument()
+  })
+})
+```
+
+### Aplicando test con MSW: Mock Service Worker (MSW).
+
+Dependiendo del tipo de test que se quiera aplicar pero si son tests más sociables sobre la UI se puede utilizar un servidor **http** con respuestas predefinidas.
 
 Esto implica que se acabaría incumplimiento la F del acrónimo FIRST dado que al crear servidores http, ésta podría no ser rápida.
 
@@ -184,6 +209,20 @@ MSW: Mock Service Worker (MSW) mejora las pruebas de los componentes que realiza
 ¿Cómo acabaría testeando ésta nueva funcionalidad?
 
 Acabaría omitiendo los tests unitarios (application) ya que carece de lógica y no me aporta valor, y me centraría más en crear tests de UI que prueban todo el flujo aunque falseando la respuesta de la API con MSW.
+
+Ver más sobre este tema [acá](https://blog.codium.team/2023-08_arquitectura-hexagonal-frontend-mis-problemas).
+
+```ts
+```
+
+### Importante agregar test E2E
+
+El hecho de falsear la respuesta con MSW puede dar la falsa seguridad de que todo está funcionando, por tanto, para sentirme más seguro a la hora de desplegar, acabaría creando, tests e2e (happy path) en un entorno pre o test de humo con cypress **(o playwright)**.
+
+Para cerrar, el último motivo por el cuál opto por simplificar las capas al aplicar arquitectura hexagonal es por cuestiones de optimización **(tiempo de carga de la web)**.
+
+En resumen, seguimos poniendo en el centro la capa de dominio (y sus reglas de negocio si existiese) pero impulsamos la simplicidad: no necesitamos implementar capas intermedias entre la lógica de la aplicación, la fuente de datos y su representación visual.
+
 
 # React + TypeScript + Vite
 
