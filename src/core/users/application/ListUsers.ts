@@ -1,25 +1,16 @@
-import { type User, UserRepository } from '../domain/User'
-
-export type ProductDTO = {
-  name: string
-  email: string
-  age: number
-}
+import { APIClient } from '../../api-client'
+import { type User } from '../domain/User'
 
 class ListUsers {
-  constructor(private userRepository: UserRepository) {}
+  private readonly apiClient: APIClient
 
-  async getUsers(): Promise<ProductDTO[]> {
-    const users = await this.userRepository.getUsers()
-    return users.map(product => this.convertToUserDTO(product))
+  constructor() {
+    this.apiClient = new APIClient()
   }
 
-  private convertToUserDTO(user: User): ProductDTO {
-    return {
-      name: user.name,
-      email: user.email,
-      age: user.age,
-    }
+  async getUsers(): Promise<User[]> {
+    const users = await this.apiClient.get<User[]>('/users')
+    return users
   }
 }
 

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import ListUsers, { type ProductDTO } from './core/users/application/ListUsers'
-import HttpUserRepository from './core/users/adapters/HttpUserRepository'
+// import { APIClient } from './core/api-client'
+import ListUsers from './core/users/application/ListUsers'
+import { User } from './core/users/domain/User'
 import './styles/App.css'
 
 function App() {
-  const [users, setUsers] = useState<ProductDTO[]>([])
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
-    const userRepository = new HttpUserRepository('https://jsonplaceholder.typicode.com')
-    const listUsers = new ListUsers(userRepository)
+    const listUsers = new ListUsers()
     listUsers.getUsers().then(setUsers)
   }, [])
 

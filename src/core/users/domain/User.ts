@@ -3,7 +3,3 @@ export type User = {
   email: string
   age: number
 }
-
-export interface UserRepository {
-  getUsers(): Promise<User[]>
-}
