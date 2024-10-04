@@ -163,7 +163,80 @@ export default App
 ## Aplicando arquitectura hexagonal v2
 
 ```ts
+// domain
+export type User = {
+  name: string
+  email: string
+  age: number
+}
+
+// application
+import { APIClient } from '../../api-client'
+import { type User } from '../domain/User'
+
+class ListUsers {
+  private readonly apiClient: APIClient
+
+  constructor() {
+    this.apiClient = new APIClient()
+  }
+
+  async getUsers(): Promise<User[]> {
+    const users = await this.apiClient.get<User[]>('/users')
+    return users
+  }
+}
+
+export default ListUsers
+
+// api-client
+import axios from 'axios'
+
+export class APIClient {
+  private readonly baseUrl: string
+
+  constructor(baseUrl: string = import.meta.env.API_URL || 'https://jsonplaceholder.typicode.com') {
+    this.baseUrl = baseUrl
+  }
+
+  async get<T>(path: string): Promise<T> {
+    const response = await axios.get<T>(`${this.baseUrl}${path}`)
+    return response.data
+  }
+
+  // more methods
+}
 ```
+
+### Patrones aplicados
+
+1. Inversión de Dependencias **(Dependency Inversion Principle - DIP)**:
+
+La clase `ListUsers` depende de la abstracción (interface) `APIClient` para obtener datos, no de una implementación específica. Esto permite cambiar el detalle de la implementación (como la biblioteca `axios`) sin afectar a la lógica de negocio.
+
+2. Inyección de Dependencias **(Dependency Injection - DI)**:
+
+Utilizamos la instancia de `APIClient` como una dependencia gestionada internamente. Se podría mejorar inyectando esta dependencia desde fuera, pero es una **forma básica de aplicar inyección de dependencias**.
+
+3. Patrón de Repositorio (aunque simplificado)
+
+En este caso, la clase `APIClient` actúa como una especie de **"repositorio"**, ya que maneja la lógica de obtención de datos de una fuente externa **(API)** y oculta los detalles de la infraestructura **(axios)** a la capa de aplicación (`ListUsers`).
+
+4. Patrón de Servicio
+
+La clase `ListUsers` funciona como un **"servicio"** que encapsula la lógica de aplicación para interactuar con la **API**. Aunque simplificada, sigue el patrón de tener servicios que *gestionan operaciones específicas*, como listar usuarios.
+
+```ts
+class ListUsers {
+  constructor(private readonly apiClient: APIClient) {}
+
+  async getUsers(): Promise<User[]> {
+    return this.apiClient.get<User[]>('/users'); // Servicio que utiliza el "repositorio APIClient"
+  }
+}
+```
+
+Estos patrones mantienen el código modular y fácil de escalar, permitiendo el reemplazo de detalles como la fuente de datos (API) sin afectar a la lógica principal.
 
 ## Testing
 
@@ -213,6 +286,60 @@ Acabaría omitiendo los tests unitarios (application) ya que carece de lógica y
 Ver más sobre este tema [acá](https://blog.codium.team/2023-08_arquitectura-hexagonal-frontend-mis-problemas).
 
 ```ts
+import { render, screen } from '@testing-library/react'
+import { usersHandlerException } from '../api-mocks/handlers'
+import { mswServer, http, HttpResponse } from '../api-mocks/msw-server'
+import App from '../App'
+
+describe('Component: App', () => {
+  it('displays returned users on successful fetch', async () => {
+    render(<App />)
+
+    const displayedUsers = await screen.findAllByTestId(/user-id-\d+/)
+    expect(displayedUsers).toHaveLength(2)
+    expect(screen.getByText('John Serrano')).toBeInTheDocument()
+    expect(screen.getByText('Andrey Caselles')).toBeInTheDocument()
+  })
+
+  it('displays returned users on successful fetch', async () => {
+    createGetSuccessResponse('/users', [
+      {
+        name: 'Name 01',
+        email: 'name01@email.com',
+        age: 20,
+      },
+      {
+        name: 'Name 02',
+        email: 'name02@email.com',
+        age: 27,
+      },
+    ])
+
+    render(<App />)
+
+    const displayedUsers = await screen.findAllByTestId(/user-id-\d+/)
+    expect(displayedUsers).toHaveLength(2)
+    expect(screen.getByText('Name 01')).toBeInTheDocument()
+    expect(screen.getByText('Name 02')).toBeInTheDocument()
+  })
+
+  // en caso de que quisiera testear un error
+  it.skip('displays error message when fetching users raises error', async () => {
+    mswServer.use(usersHandlerException)
+    render(<App />)
+
+    const errorDisplay = await screen.findByText('Failed to fetch users')
+    expect(errorDisplay).toBeInTheDocument()
+    const displayedUsers = screen.queryAllByTestId(/user-id-\d+/)
+    expect(displayedUsers).toEqual([])
+  })
+})
+
+function createGetSuccessResponse(path: string, response: Record<string, unknown> | Record<string, unknown>[]) {
+  const usersHandler = http.get(`https://jsonplaceholder.typicode.com${path}`, async () => HttpResponse.json(response))
+
+  mswServer.use(usersHandler)
+}
 ```
 
 ### Importante agregar test E2E
