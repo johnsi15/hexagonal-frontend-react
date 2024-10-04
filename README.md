@@ -236,7 +236,7 @@ class ListUsers {
 }
 ```
 
-Estos patrones mantienen el código modular y fácil de escalar, permitiendo el reemplazo de detalles como la fuente de datos (API) sin afectar a la lógica principal.
+Estos patrones mantienen el código modular y fácil de escalar, permitiendo el reemplazo de detalles como la **fuente de datos (API)** sin afectar a la lógica principal.
 
 ## Testing
 
@@ -269,7 +269,7 @@ describe('Component: App', () => {
 })
 ```
 
-### Aplicando test con MSW: Mock Service Worker (MSW).
+### Aplicando test con MSW: Mock Service Worker (MSW)
 
 Dependiendo del tipo de test que se quiera aplicar pero si son tests más sociables sobre la UI se puede utilizar un servidor **http** con respuestas predefinidas.
 
