@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import '@testing-library/jest-dom/vitest'
 
 import { mswServer } from './api-mocks/msw-server'
